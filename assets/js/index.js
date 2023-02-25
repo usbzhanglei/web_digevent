@@ -25,7 +25,7 @@ function getUserInfo() {
       Authorization: localStorage.getItem('token') || ''
     }, */
     success: function (res) {
-      console.log(res);
+      // console.log(res);
       if (res.status) return layui.layer.msg('获取用户信息失败')
       renderAvater(res.data)
     },
@@ -45,6 +45,7 @@ function renderAvater(user) {
   const name = user.nickname || user.username
   $('#welcome').html(`欢迎&nbsp;${name}`)
   const url = user.user_pic
+  $('#datid').attr('data-id', user.id)
   if (url) {
     $('.layui-nav-img').attr('src', url).show()
     $('.text-avatar').hide()

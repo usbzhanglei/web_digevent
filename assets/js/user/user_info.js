@@ -1,55 +1,54 @@
-$(function() {
-  var form = layui.form
-  var layer = layui.layer
-
+$(function () {
+  const form = layui.form
+  const layer = layui.layer
   form.verify({
-    nickname: function(value) {
-      if (value.length > 6) {
-        return '昵称长度必须在 1 ~ 6 个字符之间！'
+    nickname: function (value) {
+      if (value.length > 6 || value.length < 1) {
+        return '昵称长度应该在1 ~ 6长度之间!!!'
       }
     }
   })
-
-  initUserInfo()
-
-  // 初始化用户的基本信息
+  // 初始化用户基本信息
   function initUserInfo() {
     $.ajax({
-      method: 'GET',
+      method: 'get',
       url: '/my/userinfo',
-      success: function(res) {
-        if (res.status !== 0) {
-          return layer.msg('获取用户信息失败！')
-        }
-        // console.log(res)
-        // 调用 form.val() 快速为表单赋值
-        form.val('formUserInfo', res.data)
+      success: function (res) {
+        // console.log(res);
+        if (res.status) return layer.msg('获取用户信息失败!')
+        // console.log(res);
+        // form.val('formUserInfo', res.data)
+        // console.log(res.data.username);
+        $('#formUserInfo').val(res.data.username)
+
       }
     })
   }
-
-  // 重置表单的数据
-  $('#btnReset').on('click', function(e) {
-    // 阻止表单的默认重置行为
+  initUserInfo()
+  //重置表单数据
+  $('#btnReset').click(function (e) {
     e.preventDefault()
     initUserInfo()
   })
 
-  // 监听表单的提交事件
-  $('.layui-form').on('submit', function(e) {
-    // 阻止表单的默认提交行为
+  $('.layui-form').on('submit', function (e) {
     e.preventDefault()
-    // 发起 ajax 数据请求
+    // console.log($('#nickname').val());
+    const span = window.parent.$('#datid')[0]
+    // console.log(span.dataset.id);
     $.ajax({
-      method: 'POST',
+      method: 'post',
       url: '/my/userinfo',
-      data: $(this).serialize(),
-      success: function(res) {
-        if (res.status !== 0) {
-          return layer.msg('更新用户信息失败！')
-        }
+      data: {
+        id: span.dataset.id,
+        nickname: $('#nickname').val(),
+        email: $('#email').val()
+      },
+      success: function (res) {
+        // console.log(res);
+        if (res.status) return layer.msg('更新用户信息失败！')
         layer.msg('更新用户信息成功！')
-        // 调用父页面中的方法，重新渲染用户的头像和用户的信息
+        //调用父页面（index.html）方法
         window.parent.getUserInfo()
       }
     })
